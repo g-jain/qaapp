@@ -1,0 +1,172 @@
+<style>
+.topbar {
+  width:100%;
+  height:7px;
+  position: absolute;
+  z-index:1000;
+
+  background: #FF8800;
+}
+</style>
+
+<div class="topbar"></div>
+
+<div class="container">
+
+{% include "qa/header.html" %}
+
+<div class="col-md-8">
+
+  <ul class="nav nav-tabs nav-justified">
+    <li role="presentation" class="active"><a href="#latest" aria-controls="latest" role="tab" data-toggle="tab"><span class="glyphicon glyphicon-th-list" aria-hidden="true"></span> Latest</a></li>
+    <li role="presentation"><a href="#unans" aria-controls="unans" role="tab" data-toggle="tab"><span class="glyphicon glyphicon-question-sign" aria-hidden="true"></span> Unanswered <span class="badge">{{ noans.count }}</span></a></li>
+    <li role="presentation"><a href="#reward" aria-controls="reward" role="tab" data-toggle="tab"><span class="glyphicon glyphicon-star" aria-hidden="true"></span> Most Rewarding <span class="badge">{{ reward.count }}</span></a></li>
+  </ul>
+  <br/>
+
+
+<div class="tab-content">
+<div role="tabpanel" class="tab-pane active" id="latest">
+{% if questions %}
+  {% for question in questions %}
+  <div class="row">
+  <div class="col-sm-1 ans"><small><div class="ques">{{ question.answer_set.count }}</div>Answers</small></div>
+  <div class="col-sm-1 ans"><small><div class="ques">{{ question.views }}</div>Views</small></div>
+  <p>
+    {% if question.reward %}<span class="glyphicon glyphicon-fire" aria-hidden="true"></span>{% endif %} <a class="ques" href="/q/{{ question.id }}/">{{ question.question_text }}</a>
+    <br/>
+    {% for tag in question.tags.all %}
+    <a href="/tag/{{ tag.slug|slugify }}/"><tag>{{ tag.slug }}</tag></a>
+    {% endfor %}
+    <small> {{ question.pub_date}}</small>
+  </p>
+</div>
+<hr>
+  {% endfor %}
+
+<div class="pagination">
+  <span class="step-links">
+    {% if questions.has_previous %}
+    <a href="?page={{ questions.previous_page_number }}">< Previous | </a>
+    {% endif %}
+
+    <span class="current">
+      Page {{ questions.number }} of {{ questions.paginator.num_pages }}.
+    </span>
+
+    {% if questions.has_next %}
+    <a href="?page={{ questions.next_page_number }}"> | Next ></a>
+    {% endif %}
+  </span>
+</div>
+
+{% else %}
+<div class="alert alert-warning" role="alert">No Questions are available!</div>
+{% endif %}
+</div>
+
+<div role="tabpanel" class="tab-pane" id="unans">
+{% if noans %}
+  {% for question in noans %}
+  <div class="row">
+  <div class="col-sm-1 ans"><small><div class="ques">{{ question.answer_set.count }}</div>Answers</small></div>
+  <div class="col-sm-1 ans"><small><div class="ques">{{ question.views }}</div>Views</small></div>
+  <p>
+    {% if question.answer_set.count %}<span class="glyphicon glyphicon-fire" aria-hidden="true"></span>{% endif %} <a class="ques" href="/q/{{ question.id }}/">{{ question.question_text }}</a>
+    <br/>
+    {% for tag in question.tags.all %}
+    <a href="/tag/{{ tag.slug|slugify }}/"><tag>{{ tag.slug }}</tag></a>
+    {% endfor %}
+    <small> {{ question.pub_date}}</small>
+  </p>
+</div>
+<hr>
+  {% endfor %}
+
+{% else %}
+<div class="alert alert-warning" role="alert">No Questions are available!</div>
+{% endif %}
+</div>
+
+<div role="tabpanel" class="tab-pane" id="reward">
+{% if reward %}
+  {% for question in reward %}
+  <div class="row">
+  <div class="col-sm-1 ans"><small><div class="ques">{{ question.answer_set.count }}</div>Answers</small></div>
+  <div class="col-sm-1 ans"><small><div class="ques">{{ question.views }}</div>Views</small></div>
+  <p>
+    {% if question.answer_set.count %}<span class="glyphicon glyphicon-fire" aria-hidden="true"></span>{% endif %} <a class="ques" href="/q/{{ question.id }}/">{{ question.question_text }}</a>
+    <br/>
+    <reward>Earn <b>{{ question.reward }}</b> points</reward>
+    {% for tag in question.tags.all %}
+    <a href="/tag/{{ tag.slug|slugify }}/"><tag>{{ tag.slug }}</tag></a>
+    {% endfor %}
+    <small> {{ question.pub_date}}</small>
+  </p>
+</div>
+<hr>
+  {% endfor %}
+
+{% else %}
+<div class="alert alert-warning" role="alert">No Questions are available!</div>
+{% endif %}
+</div>
+
+  </div>
+</div>
+
+<div class="col-md-4">
+
+  <div class="panel panel-default">
+    <div class="panel-body">
+      <h4>Total Questions: {{ totalcount }}</h4>
+      <h4>Total Answers: {{ anscount }}</h4>
+    </div>
+  </div>
+
+  <div class="panel panel-default">
+    <div class="panel-heading">
+      <h3 class="panel-title"><span class="glyphicon glyphicon-tag" aria-hidden="true"></span> Recent Tags</h3>
+    </div>
+    <div class="panel-body">
+      {% for question in questions %}
+      {% for tag in question.tags.all %}
+      <a href="/tag/{{ tag.slug|slugify }}/"><tag>{{ tag.slug }}</tag></a>
+      {% endfor %}
+      {% endfor %}
+    </div>
+  </div>
+
+  {% if noans.count %}
+  <div class="panel panel-warning">
+    <div class="panel-heading">
+      <h3 class="panel-title">Unanswered Questions</h3>
+    </div>
+    <div class="panel-body">
+    <ul>
+      {% for question in noans %}
+      <li><a href="/q/{{ question.id }}/">{{ question.question_text }}</a></li>
+      {% endfor %}
+    </ul>
+    </div>
+  </div>
+  {% endif %}
+
+  {% if user.is_authenticated %}
+
+  <div class="span3 well">
+    <center>
+      <a href="/profile/{{ user.id }}" data-toggle="modal"><img src="/static/qa/user.png" name="aboutme" width="100" height="100" class="img-circle"></a>
+      <h3>{{ user.first_name }} {{ user.last_name }}</h3>
+      <a href="/profile/{{ user.id }}">My Profile</a> |
+      <a href="/logout/">Logout</a>
+    </center>
+  </div>
+  {% else %}
+  <a class="btn btn-block btn-success" href="/login"><span class="glyphicon glyphicon-user" aria-hidden="true"></span> Login | Sign Up</a><br/>
+  {% endif %}
+
+</div>
+</div>
+
+{% include "qa/footer.html" %}
