@@ -64,4 +64,4 @@ urlpatterns = [
 
     #url('^forgot/', include('password_reset.urls')),
 
-
+]

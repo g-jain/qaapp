@@ -1,8 +1,6 @@
 from django.conf.urls import  include, url
 from django.contrib import admin
-
 from qa import views
-
 from django.conf.urls import url, include
 from django.contrib.auth.models import User
 from qa.models import Question, Tag
@@ -57,7 +55,7 @@ urlpatterns = [
     url(r'^login/$', views.user_login, name='login'),
     url(r'^logout/$', views.user_logout, name='logout'),
 
- #   url('^markdown/', include( 'django_markdown.urls')),
+    url('^markdown/', include( 'django_markdown.urls')),
 
     url(r'^', include(router.urls)),
     url(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework')),
